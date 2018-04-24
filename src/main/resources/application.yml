@@ -3,10 +3,18 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/wxorder?AutoReconnect=true&useSSL=false
+    url: jdbc:mysql://localhost:3306/wxorder?AutoReconnect=true&characterEncoding=utf-8&useSSL=false
     username: root
     password: 9o0p-[=]
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+#logging:
+#  pattern:
+#    console: "%d - %msg%n"
+##  path: D:\JavaProjects\WXOrderDemo\logs
+#  file: D:\JavaProjects\WXOrderDemo\logs\wxod.log
+#  level:
+##    com.mongode: debug
+#    com.mongode.LoggerTest: debug

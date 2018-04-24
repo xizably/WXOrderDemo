@@ -68,3 +68,5 @@ create table `order_detail` (
   engine InnoDB
   default character set utf8
   comment '订单详情表';
+
+-- alter table product_info drop column product_description;
