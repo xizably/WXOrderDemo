@@ -1,7 +1,8 @@
 package cn.mongode.wxorder.repository;
 
 import cn.mongode.wxorder.dataobject.ProductInfo;
-import cn.mongode.wxorder.service.InfoService;
+import cn.mongode.wxorder.enums.ProductStatusEnum;
+import cn.mongode.wxorder.service.ProInfoService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +21,7 @@ public class ProductInfoRepositoryTest {
     private ProductInfoRepository productInfoRepository;
     
     @Autowired
-    private InfoService infoService;
+    private ProInfoService infoService;
     
     @Test
     public void save() throws Exception{
@@ -35,7 +36,7 @@ public class ProductInfoRepositoryTest {
     
     @Test
     public void findByProductStatus() throws Exception{
-        List<ProductInfo> list = productInfoRepository.findByProductStatus(0);
+        List<ProductInfo> list = productInfoRepository.findByProductStatus(ProductStatusEnum.UP.getCode());
         Assert.assertNotEquals(0, list.size());
     }
     

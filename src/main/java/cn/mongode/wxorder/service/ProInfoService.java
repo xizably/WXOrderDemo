@@ -1,6 +1,8 @@
 package cn.mongode.wxorder.service;
 
 import cn.mongode.wxorder.dataobject.ProductInfo;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,14 +14,21 @@ import java.util.List;
  * @description:
  */
 @Service
-public interface InfoService {
+public interface ProInfoService {
     
     ProductInfo findByInfoId(String infoId);
     
+    /* 查询所有在架商品 */
     List<ProductInfo> findUpAll();
     
-    List<ProductInfo> findByInfoStatus(Integer infoStatus);
+    Page<ProductInfo> findAll(Pageable pageable);
     
     ProductInfo save(ProductInfo productInfo);
+    
+    /* 加库存 */
+    
+    
+    /* 减库存 */
+    
     
 }

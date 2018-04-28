@@ -1,9 +1,13 @@
 package cn.mongode.wxorder.service.impl;
 
 import cn.mongode.wxorder.dataobject.ProductInfo;
+import cn.mongode.wxorder.enums.ProductStatusEnum;
 import cn.mongode.wxorder.repository.ProductInfoRepository;
-import cn.mongode.wxorder.service.InfoService;
+import cn.mongode.wxorder.service.ProInfoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -12,7 +16,8 @@ import java.util.List;
  * @date: 2018/4/24
  * @description:
  */
-public class InfoServiceImpl implements InfoService {
+@Service
+public class ProInfoServiceImpl implements ProInfoService {
     
     @Autowired
     private ProductInfoRepository repository;
@@ -27,16 +32,17 @@ public class InfoServiceImpl implements InfoService {
     
     @Override
     public List<ProductInfo> findUpAll() {
-        return repository.findAll();
+        return repository.findByProductStatus(ProductStatusEnum.UP.getCode());
     }
     
     @Override
-    public List<ProductInfo> findByInfoStatus(Integer infoStatus) {
-        return repository.findByProductStatus(infoStatus);
+    public Page<ProductInfo> findAll(Pageable pageable) {
+        return repository.findAll(pageable);
     }
     
     @Override
     public ProductInfo save(ProductInfo productInfo) {
         return repository.save(productInfo);
     }
+    
 }
