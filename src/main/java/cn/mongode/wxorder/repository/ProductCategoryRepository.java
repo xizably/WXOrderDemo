@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author: Mongo
  * @date: 2018/4/23
- * @description:
+ * @description: 商品库存仓储
  */
 public interface ProductCategoryRepository extends JpaRepository<ProductCategory, Integer> {
     

@@ -19,8 +19,12 @@ import java.util.List;
 @Service
 public class ProInfoServiceImpl implements ProInfoService {
     
+    private final ProductInfoRepository repository;
+    
     @Autowired
-    private ProductInfoRepository repository;
+    public ProInfoServiceImpl(ProductInfoRepository repository) {
+        this.repository = repository;
+    }
     
     @Override
     public ProductInfo findByInfoId(String infoId) {
