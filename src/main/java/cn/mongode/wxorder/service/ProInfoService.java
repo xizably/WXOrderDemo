@@ -1,6 +1,7 @@
 package cn.mongode.wxorder.service;
 
 import cn.mongode.wxorder.dataobject.ProductInfo;
+import cn.mongode.wxorder.dto.CartDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -26,9 +27,9 @@ public interface ProInfoService {
     ProductInfo save(ProductInfo productInfo);
     
     /* 加库存 */
-    
+    void increaseStock(List<CartDTO> cartDTOList);
     
     /* 减库存 */
-    
+    void decreaseStock(List<CartDTO> cartDTOList);
     
 }

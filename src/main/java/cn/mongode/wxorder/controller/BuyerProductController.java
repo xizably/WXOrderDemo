@@ -7,6 +7,7 @@ import cn.mongode.wxorder.dataobject.ProductCategory;
 import cn.mongode.wxorder.dataobject.ProductInfo;
 import cn.mongode.wxorder.service.CategoryService;
 import cn.mongode.wxorder.service.ProInfoService;
+import cn.mongode.wxorder.utils.ResultVOUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,11 +72,7 @@ public class BuyerProductController {
             productVO.setProductInfoVOList(productInfoVOList);
             productVOList.add(productVO);
         }
-
-        ResultVO resultVO = new ResultVO();
-        resultVO.setCode(0);
-        resultVO.setMsg("成功");
-        resultVO.setData(productVOList);
-        return resultVO;
+        
+        return ResultVOUtil.success(productVOList);
     }
 }
