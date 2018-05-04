@@ -17,8 +17,7 @@ import java.util.List;
 @Service
 public class CategoryServiceImpl implements CategoryService {
     
-    @Autowired
-    private ProductCategoryRepository repository;
+    private final ProductCategoryRepository repository;
     
     @Autowired
     public CategoryServiceImpl(ProductCategoryRepository repository) {
@@ -27,10 +26,7 @@ public class CategoryServiceImpl implements CategoryService {
     
     @Override
     public ProductCategory findById(Integer categoryId) {
-        if (repository.findById(categoryId).isPresent()) {
-            return repository.findById(categoryId).get();
-        }
-        return null;
+        return repository.findById(categoryId).isPresent() ? repository.findById(categoryId).get() : null;
     }
     
     @Override

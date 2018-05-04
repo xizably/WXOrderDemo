@@ -5,6 +5,8 @@ import cn.mongode.wxorder.dataobject.OrderMaster;
 import cn.mongode.wxorder.dataobject.ProductInfo;
 import cn.mongode.wxorder.dto.CartDTO;
 import cn.mongode.wxorder.dto.OrderDTO;
+import cn.mongode.wxorder.enums.OrderStatusEnum;
+import cn.mongode.wxorder.enums.PayStatusEnum;
 import cn.mongode.wxorder.enums.ResultEnum;
 import cn.mongode.wxorder.exception.OrderException;
 import cn.mongode.wxorder.repository.OrderDetailRepository;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -31,16 +34,23 @@ import java.util.stream.Collectors;
 @Service
 public class OrderServiceImpl implements OrderService {
     
-    @Autowired
-    private ProInfoService proInfoService;
+    private final ProInfoService proInfoService;
+    
+    private final OrderDetailRepository orderDetailRepository;
+    
+    private final OrderMasterRepository orderMasterRepository;
     
     @Autowired
-    private OrderDetailRepository orderDetailRepository;
-    
-    @Autowired
-    private OrderMasterRepository orderMasterRepository;
+    public OrderServiceImpl(ProInfoService proInfoService,
+                            OrderDetailRepository orderDetailRepository,
+                            OrderMasterRepository orderMasterRepository) {
+        this.proInfoService = proInfoService;
+        this.orderDetailRepository = orderDetailRepository;
+        this.orderMasterRepository = orderMasterRepository;
+    }
     
     @Override
+    @Transactional
     public OrderDTO create(OrderDTO orderDTO) {
         
         String orderId = KeyUtil.genUniqueKey();
@@ -54,7 +64,7 @@ public class OrderServiceImpl implements OrderService {
             }
             
             // 2.计算总价 - 价格要从数据库取!
-            orderAmount = orderDetail.getProductPrice()
+            orderAmount = productInfo.getProductPrice()
                     .multiply(new BigDecimal(orderDetail.getProductQuantity()))
                     .add(orderAmount);
             
@@ -70,6 +80,8 @@ public class OrderServiceImpl implements OrderService {
         BeanUtils.copyProperties(orderDTO, orderMaster);
         orderMaster.setOrderId(orderId);
         orderMaster.setOrderAmount(orderAmount);
+        orderMaster.setOrderStatus(OrderStatusEnum.NEW.getCode());
+        orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
         orderMasterRepository.save(orderMaster);
         
         // 4.扣除库存 - 判断库存是否足够
@@ -77,17 +89,28 @@ public class OrderServiceImpl implements OrderService {
                 .map(e -> new CartDTO(e.getProductId(), e.getProductQuantity()))
                 .collect(Collectors.toList());
         proInfoService.decreaseStock(cartDTOList);
-        
+    
+        BeanUtils.copyProperties(orderMaster, orderDTO);
         return orderDTO;
     }
     
     @Override
     public OrderDTO findByOrderId(String orderId) {
-        return null;
+        OrderMaster orderMaster = orderMasterRepository.findById(orderId).isPresent()
+                ? orderMasterRepository.findById(orderId).get() : new OrderMaster();
+        OrderDTO orderDTO = new OrderDTO();
+        BeanUtils.copyProperties(orderMaster, orderDTO);
+        List<OrderDetail> orderDetailList = orderDetailRepository.findByOrderId(orderId);
+        orderDTO.setOrderDetailList(orderDetailList);
+        return orderDTO;
     }
     
     @Override
     public Page<OrderDTO> findOrderList(String buyerOpenid, Pageable pageable) {
+
+//        PageRequest request = new PageRequest(0,3);
+
+//        return orderMasterRepository.findAll(pageable);
         return null;
     }
     
