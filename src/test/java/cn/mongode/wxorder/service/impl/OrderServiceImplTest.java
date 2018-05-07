@@ -3,6 +3,7 @@ package cn.mongode.wxorder.service.impl;
 import cn.mongode.wxorder.dataobject.OrderDetail;
 import cn.mongode.wxorder.dto.OrderDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import java.util.List;
 @Slf4j
 public class OrderServiceImplTest {
     
-    private final String BUYER_OPENID = "wxoid952700";
     @Autowired
     private OrderServiceImpl orderService;
     
@@ -28,6 +28,7 @@ public class OrderServiceImplTest {
         orderDTO.setBuyerName("QHT9527");
         orderDTO.setBuyerAddress("CN.JS.WX.XQ.CJ-GJ-YQ");
         orderDTO.setBuyerPhone("12395279527");
+        String BUYER_OPENID = "wxoid952700";
         orderDTO.setBuyerOpenid(BUYER_OPENID);
         
         List<OrderDetail> orderDetailList = new ArrayList<>();
@@ -43,14 +44,20 @@ public class OrderServiceImplTest {
         orderDTO.setOrderDetailList(orderDetailList);
         OrderDTO result = orderService.create(orderDTO);
         log.info("Create Order => result = {}.", result);
+        Assert.assertNotNull(result);
     }
     
     @Test
     public void findByOrderId() {
+        String ORDER_ID = "1525424468790689444";
+        OrderDTO orderDTO = orderService.findByOrderId(ORDER_ID);
+        log.info("【查询单个订单】 result = {}", orderDTO);
+        Assert.assertNotNull(orderDTO);
     }
     
     @Test
     public void findOrderList() {
+    
     }
     
     @Test

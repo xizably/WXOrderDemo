@@ -1,5 +1,6 @@
 package cn.mongode.wxorder.service.impl;
 
+import cn.mongode.wxorder.convertor.OrderMasterToDTO;
 import cn.mongode.wxorder.dataobject.OrderDetail;
 import cn.mongode.wxorder.dataobject.OrderMaster;
 import cn.mongode.wxorder.dataobject.ProductInfo;
@@ -17,9 +18,12 @@ import cn.mongode.wxorder.utils.KeyUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -97,21 +101,29 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDTO findByOrderId(String orderId) {
         OrderMaster orderMaster = orderMasterRepository.findById(orderId).isPresent()
-                ? orderMasterRepository.findById(orderId).get() : new OrderMaster();
+                ? orderMasterRepository.findById(orderId).get() : null;
+        if (orderMaster == null) {
+            throw new OrderException(ResultEnum.ORDER_NOT_EXIST);
+        }
+        List<OrderDetail> orderDetailList = orderDetailRepository.findByOrderId(orderId);
+        if (CollectionUtils.isEmpty(orderDetailList)) {
+            throw new OrderException(ResultEnum.ORDERDETAIL_NOT_EXIST);
+        }
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderMaster, orderDTO);
-        List<OrderDetail> orderDetailList = orderDetailRepository.findByOrderId(orderId);
         orderDTO.setOrderDetailList(orderDetailList);
         return orderDTO;
     }
     
     @Override
     public Page<OrderDTO> findOrderList(String buyerOpenid, Pageable pageable) {
-
-//        PageRequest request = new PageRequest(0,3);
-
-//        return orderMasterRepository.findAll(pageable);
-        return null;
+        PageRequest request = new PageRequest(0, 3);
+        Page<OrderMaster> orderMasters = orderMasterRepository.findByBuyerOpenid(buyerOpenid, request);
+        
+        
+        Page<OrderDTO> orderDTOPage = OrderMasterToDTO.convert(orderMasters.getContent());
+        
+        return orderDTOS;
     }
     
     @Override

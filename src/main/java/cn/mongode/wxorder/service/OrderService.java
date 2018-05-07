@@ -10,7 +10,7 @@ public interface OrderService {
     OrderDTO create(OrderDTO orderDTO);
     
     /* 查询单个订单. */
-    OrderDTO findByOrderId(String orderId);
+    OrderDTO findByOrderId(String orderId) throws Exception;
     
     /* 根据用户微信openid查询订单列表. */
     Page<OrderDTO> findOrderList(String buyerOpenid, Pageable pageable);
