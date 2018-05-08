@@ -55,7 +55,16 @@ public class ProInfoServiceImpl implements ProInfoService {
     
     @Override
     public void increaseStock(List<CartDTO> cartDTOList) {
-    
+        for (CartDTO cartDTO: cartDTOList) {
+            ProductInfo productInfo = findByInfoId(cartDTO.getProductId());
+            if (productInfo == null) {
+                throw new OrderException(ResultEnum.PRODUCT_NOT_EXIST);
+            }
+            
+            Integer result = productInfo.getProductStock() + cartDTO.getProductQuantity();
+            productInfo.setProductStock(result);
+            repository.save(productInfo);
+        }
     }
     
     @Override

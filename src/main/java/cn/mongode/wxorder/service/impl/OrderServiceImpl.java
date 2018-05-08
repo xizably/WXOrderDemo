@@ -1,6 +1,6 @@
 package cn.mongode.wxorder.service.impl;
 
-import cn.mongode.wxorder.convertor.OrderMasterToDTO;
+import cn.mongode.wxorder.convertor.OrderMasterToDTOConvert;
 import cn.mongode.wxorder.dataobject.OrderDetail;
 import cn.mongode.wxorder.dataobject.OrderMaster;
 import cn.mongode.wxorder.dataobject.ProductInfo;
@@ -15,11 +15,11 @@ import cn.mongode.wxorder.repository.OrderMasterRepository;
 import cn.mongode.wxorder.service.OrderService;
 import cn.mongode.wxorder.service.ProInfoService;
 import cn.mongode.wxorder.utils.KeyUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,12 +36,11 @@ import java.util.stream.Collectors;
  * @description:
  */
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
     
     private final ProInfoService proInfoService;
-    
     private final OrderDetailRepository orderDetailRepository;
-    
     private final OrderMasterRepository orderMasterRepository;
     
     @Autowired
@@ -107,7 +106,7 @@ public class OrderServiceImpl implements OrderService {
         }
         List<OrderDetail> orderDetailList = orderDetailRepository.findByOrderId(orderId);
         if (CollectionUtils.isEmpty(orderDetailList)) {
-            throw new OrderException(ResultEnum.ORDERDETAIL_NOT_EXIST);
+            throw new OrderException(ResultEnum.ORDER_DETAIL_NOT_EXIST);
         }
         OrderDTO orderDTO = new OrderDTO();
         BeanUtils.copyProperties(orderMaster, orderDTO);
@@ -117,27 +116,91 @@ public class OrderServiceImpl implements OrderService {
     
     @Override
     public Page<OrderDTO> findOrderList(String buyerOpenid, Pageable pageable) {
-        PageRequest request = new PageRequest(0, 3);
-        Page<OrderMaster> orderMasters = orderMasterRepository.findByBuyerOpenid(buyerOpenid, request);
-        
-        
-        Page<OrderDTO> orderDTOPage = OrderMasterToDTO.convert(orderMasters.getContent());
-        
-        return orderDTOS;
+        Page<OrderMaster> orderMasterPage = orderMasterRepository.findByBuyerOpenid(buyerOpenid, pageable);
+        List<OrderDTO> orderDTOList = OrderMasterToDTOConvert.convert(orderMasterPage.getContent());
+        return new PageImpl<>(orderDTOList, pageable, orderMasterPage.getTotalElements());
     }
     
     @Override
+    @Transactional
     public OrderDTO cancel(OrderDTO orderDTO) {
-        return null;
-    }
-    
-    @Override
-    public OrderDTO finish(OrderDTO orderDTO) {
-        return null;
+        // 判断订单状态
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
+            log.error("【取消订单】 订单状态异常, orderId = {}, orderStatus = {}",
+                    orderDTO.getOrderId(), orderDTO.getOrderStatus());
+            throw new OrderException(ResultEnum.ORDER_STATUS_ERROR);
+        }
+        
+        // 修改订单状态
+        OrderMaster orderMaster = new OrderMaster();
+        orderDTO.setOrderStatus(OrderStatusEnum.CANCEL.getCode());
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+        OrderMaster updateStatus = orderMasterRepository.save(orderMaster);
+        if (updateStatus == null) {
+            log.error("【取消订单】更新失败, orderMaster = {}", orderMaster);
+            throw new OrderException(ResultEnum.ORDER_UPDATE_FALSE);
+        }
+        
+        // 返回库存
+        if (CollectionUtils.isEmpty(orderDTO.getOrderDetailList())) {
+            log.error("【取消订单】订单中无商品详情, orderDTO = {}", orderDTO);
+            throw new OrderException(ResultEnum.ORDER_DETAIL_EMPTY);
+        }
+        List<CartDTO> cartDTOList = orderDTO.getOrderDetailList().stream().
+                map(e -> new CartDTO(e.getProductId(), e.getProductQuantity())).collect(Collectors.toList());
+        proInfoService.increaseStock(cartDTOList);
+        
+        // 如果已支付，需要退款
+        if (orderDTO.getPayStatus().equals(PayStatusEnum.SUCCESS.getCode())) {
+            //TODO
+        }
+        
+        return orderDTO;
     }
     
     @Override
     public OrderDTO paid(OrderDTO orderDTO) {
-        return null;
+        // 判断订单状态
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
+            log.error("【订单支付】 订单状态异常, orderId = {}, orderStatus = {}",
+                    orderDTO.getOrderId(), orderDTO.getOrderStatus());
+            throw new OrderException(ResultEnum.ORDER_STATUS_ERROR);
+        }
+        // 判断支付状态
+        if (!orderDTO.getPayStatus().equals(PayStatusEnum.WAIT.getCode())) {
+            log.info("【订单支付】订单支付状态异常, orderDTO = {}", orderDTO);
+            throw new OrderException(ResultEnum.ORDER_PAY_STATUS_ERROR);
+        }
+        // 更新订单支付状态
+        OrderMaster orderMaster = new OrderMaster();
+        orderDTO.setPayStatus(PayStatusEnum.SUCCESS.getCode());
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+    
+        // TODO 确认是否支付成功
+        
+        orderMasterRepository.save(orderMaster);
+        return orderDTO;
+    }
+    
+    @Override
+    public OrderDTO finish(OrderDTO orderDTO) {
+        // 判断订单状态
+        if (!orderDTO.getOrderStatus().equals(OrderStatusEnum.NEW.getCode())) {
+            log.error("【订单完结】 订单状态异常, orderId = {}, orderStatus = {}",
+                    orderDTO.getOrderId(), orderDTO.getOrderStatus());
+            throw new OrderException(ResultEnum.ORDER_STATUS_ERROR);
+        }
+        // 判断支付状态
+        if (!orderDTO.getPayStatus().equals(PayStatusEnum.SUCCESS.getCode())) {
+            log.info("【订单完结】订单支付状态异常, orderDTO = {}", orderDTO);
+            throw new OrderException(ResultEnum.ORDER_PAY_STATUS_ERROR);
+        }
+        // 更新订单状态
+        OrderMaster orderMaster = new OrderMaster();
+        orderDTO.setOrderStatus(OrderStatusEnum.FINISHED.getCode());
+        BeanUtils.copyProperties(orderDTO, orderMaster);
+        orderMasterRepository.save(orderMaster);
+        
+        return orderDTO;
     }
 }
