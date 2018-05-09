@@ -79,12 +79,12 @@ public class OrderServiceImpl implements OrderService {
         }
         
         // 3.写入订单数据库(orderMaster和orderDetail)
+        orderDTO.setOrderId(orderId);
+        orderDTO.setOrderAmount(orderAmount);
+        orderDTO.setOrderStatus(OrderStatusEnum.NEW.getCode());
+        orderDTO.setPayStatus(PayStatusEnum.WAIT.getCode());
         OrderMaster orderMaster = new OrderMaster();
         BeanUtils.copyProperties(orderDTO, orderMaster);
-        orderMaster.setOrderId(orderId);
-        orderMaster.setOrderAmount(orderAmount);
-        orderMaster.setOrderStatus(OrderStatusEnum.NEW.getCode());
-        orderMaster.setPayStatus(PayStatusEnum.WAIT.getCode());
         orderMasterRepository.save(orderMaster);
         
         // 4.扣除库存 - 判断库存是否足够
@@ -93,7 +93,6 @@ public class OrderServiceImpl implements OrderService {
                 .collect(Collectors.toList());
         proInfoService.decreaseStock(cartDTOList);
     
-        BeanUtils.copyProperties(orderMaster, orderDTO);
         return orderDTO;
     }
     
@@ -136,7 +135,7 @@ public class OrderServiceImpl implements OrderService {
         orderDTO.setOrderStatus(OrderStatusEnum.CANCEL.getCode());
         BeanUtils.copyProperties(orderDTO, orderMaster);
         OrderMaster updateStatus = orderMasterRepository.save(orderMaster);
-        if (updateStatus == null) {
+        if (!updateStatus.getOrderStatus().equals(OrderStatusEnum.CANCEL.getCode())) {
             log.error("【取消订单】更新失败, orderMaster = {}", orderMaster);
             throw new OrderException(ResultEnum.ORDER_UPDATE_FALSE);
         }
@@ -153,6 +152,7 @@ public class OrderServiceImpl implements OrderService {
         // 如果已支付，需要退款
         if (orderDTO.getPayStatus().equals(PayStatusEnum.SUCCESS.getCode())) {
             //TODO
+            log.info("如果已支付，需要退款");
         }
         
         return orderDTO;

@@ -7,13 +7,13 @@ import cn.mongode.wxorder.VO.ResultVO;
  * @date: 2018/5/2
  * @description:
  */
-public class ResultVOUtil {
+public class ResultVOUtil<T> {
     
     public static ResultVO success(Object object) {
         ResultVO resultVO = new ResultVO();
-        resultVO.setData(object);
         resultVO.setCode(0);
         resultVO.setMsg("成功!");
+        resultVO.setData(object);
         return resultVO;
     }
     
