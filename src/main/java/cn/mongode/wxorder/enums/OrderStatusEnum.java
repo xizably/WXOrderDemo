@@ -2,6 +2,9 @@ package cn.mongode.wxorder.enums;
 
 import lombok.Getter;
 
+/**
+ * 订单状态枚举
+ */
 @Getter
 public enum OrderStatusEnum {
     NEW(0, "新订单"),

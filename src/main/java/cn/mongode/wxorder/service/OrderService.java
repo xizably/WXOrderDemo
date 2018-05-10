@@ -4,6 +4,11 @@ import cn.mongode.wxorder.dto.OrderDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+/**
+ * @author: Mongo
+ * @date: 2018/5/10
+ * @description: 订单服务接口 - 订单的处理：订单的创建、单个查询、列表查询、取消、完结、支付；
+ */
 public interface OrderService {
     
     /* 创建订单. */

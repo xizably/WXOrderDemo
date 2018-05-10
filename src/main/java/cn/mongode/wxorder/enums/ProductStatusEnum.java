@@ -3,7 +3,7 @@ package cn.mongode.wxorder.enums;
 import lombok.Getter;
 
 /**
- * 商品状态
+ * 商品状态枚举
  */
 @Getter
 public enum ProductStatusEnum {

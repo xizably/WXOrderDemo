@@ -8,8 +8,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
 /**
- * 类目
- * product_category
+ * 商品类目DAO:data access object(数据访问对象)
+ * @author: Mongo
+ * @date: 2018/4/24
+ * @description: 商品的类目信息：名称、编号
  */
 @Entity
 @DynamicUpdate

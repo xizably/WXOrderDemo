@@ -7,9 +7,10 @@ import javax.persistence.Id;
 import java.math.BigDecimal;
 
 /**
+ * 商品信息DAO:data access object(数据访问对象)
  * @author: Mongo
  * @date: 2018/4/24
- * @description:
+ * @description: 商品具体信息：名称、价格、库存、状态 - 关联商品类目
  */
 @Entity
 @Data

@@ -10,9 +10,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
+ * 订单主体DAO:data access object(数据访问对象)
  * @author: Mongo
  * @date: 2018/5/2
- * @description:
+ * @description: 包含买家信息和订单的主体信息
  */
 @Entity
 @Data

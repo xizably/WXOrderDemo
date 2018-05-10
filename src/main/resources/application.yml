@@ -13,6 +13,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  jackson:
+    default-property-inclusion: non_null
 #logging:
 #  pattern:
 #    console: "%d - %msg%n"

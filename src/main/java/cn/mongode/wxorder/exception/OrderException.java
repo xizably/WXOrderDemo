@@ -3,9 +3,10 @@ package cn.mongode.wxorder.exception;
 import cn.mongode.wxorder.enums.ResultEnum;
 
 /**
+ * 订单异常的处理
  * @author: Mongo
  * @date: 2018/5/2
- * @description:
+ * @description: 包含：传参 - (ResultEnum resultEnum) 或 (Integer code,String message)
  */
 public class OrderException extends RuntimeException {
     

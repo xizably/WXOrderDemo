@@ -31,9 +31,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
+ * 订单服务实现
  * @author: Mongo
- * @date: 2018/5/2
- * @description:
+ * @date: 2018/5/10
+ * @description: 订单服务 - 订单的处理：订单的创建、单个查询、列表查询、取消、完结、支付；
  */
 @Service
 @Slf4j
@@ -52,6 +53,11 @@ public class OrderServiceImpl implements OrderService {
         this.orderMasterRepository = orderMasterRepository;
     }
     
+    /**
+     * 创建订单 - 查询商品和库存、计价、详情入库、订单入库、扣库存
+     * @param orderDTO 购物车DTO(数据传输对象)
+     * @return 订单DTO - 新创建的订单
+     */
     @Override
     @Transactional
     public OrderDTO create(OrderDTO orderDTO) {
@@ -96,6 +102,11 @@ public class OrderServiceImpl implements OrderService {
         return orderDTO;
     }
     
+    /**
+     * 根据orderId查询订单
+     * @param orderId 订单id
+     * @return OrderDTO
+     */
     @Override
     public OrderDTO findByOrderId(String orderId) {
         OrderMaster orderMaster = orderMasterRepository.findById(orderId).isPresent()
@@ -113,6 +124,12 @@ public class OrderServiceImpl implements OrderService {
         return orderDTO;
     }
     
+    /**
+     * 根据openid查询订单列表
+     * @param buyerOpenid 买家微信的openid
+     * @param pageable 分页信息
+     * @return Page<OrderDTO>
+     */
     @Override
     public Page<OrderDTO> findOrderList(String buyerOpenid, Pageable pageable) {
         Page<OrderMaster> orderMasterPage = orderMasterRepository.findByBuyerOpenid(buyerOpenid, pageable);
@@ -120,6 +137,11 @@ public class OrderServiceImpl implements OrderService {
         return new PageImpl<>(orderDTOList, pageable, orderMasterPage.getTotalElements());
     }
     
+    /**
+     * 取消订单(事务控制)
+     * @param orderDTO 订单DTO
+     * @return 取消的订单DTO
+     */
     @Override
     @Transactional
     public OrderDTO cancel(OrderDTO orderDTO) {
@@ -158,6 +180,11 @@ public class OrderServiceImpl implements OrderService {
         return orderDTO;
     }
     
+    /**
+     * 支付订单
+     * @param orderDTO 订单DTO
+     * @return 支付的订单DTO
+     */
     @Override
     public OrderDTO paid(OrderDTO orderDTO) {
         // 判断订单状态
@@ -182,6 +209,11 @@ public class OrderServiceImpl implements OrderService {
         return orderDTO;
     }
     
+    /**
+     * 完结订单
+     * @param orderDTO 订单DTO
+     * @return 完结的订单DTO
+     */
     @Override
     public OrderDTO finish(OrderDTO orderDTO) {
         // 判断订单状态

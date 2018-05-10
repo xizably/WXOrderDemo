@@ -4,15 +4,16 @@ package cn.mongode.wxorder.VO;
  * http请求返回的最外层对象
  * @author: Mongo
  * @date: 2018/4/27
- * @description:
+ * @description: http请求返回的最外层对象(ViewObject - 表现层对象)
  */
+//@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ResultVO<T> {
     
     /* 错误码. */
     private Integer code;
     
     /* 提示信息. */
-    private String msg;
+    private String msg = "";
     
     /* 具体内容. */
     private T data;

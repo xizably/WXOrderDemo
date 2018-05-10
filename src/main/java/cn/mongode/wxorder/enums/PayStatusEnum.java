@@ -2,6 +2,9 @@ package cn.mongode.wxorder.enums;
 
 import lombok.Getter;
 
+/**
+ * 支付状态枚举
+ */
 @Getter
 public enum PayStatusEnum {
     WAIT(0, "等待支付"),

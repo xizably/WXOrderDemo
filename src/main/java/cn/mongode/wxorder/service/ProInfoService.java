@@ -9,10 +9,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 /**
- * 商品信息
+ * 商品信息服务
  * @author: Mongo
  * @date: 2018/4/24
- * @description:
+ * @description: 包含：查询单个商品、查询在架商品、查询所有商品、保存、加库存、减库存
  */
 @Service
 public interface ProInfoService {

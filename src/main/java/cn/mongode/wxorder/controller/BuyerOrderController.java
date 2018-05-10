@@ -6,13 +6,11 @@ import cn.mongode.wxorder.dto.OrderDTO;
 import cn.mongode.wxorder.enums.ResultEnum;
 import cn.mongode.wxorder.exception.OrderException;
 import cn.mongode.wxorder.form.OrderForm;
+import cn.mongode.wxorder.service.BuyerService;
 import cn.mongode.wxorder.service.OrderService;
 import cn.mongode.wxorder.utils.ResultVOUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +20,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * 买家订单控制器
  * @author: Mongo
  * @date: 2018/5/8
- * @description: 买家订单Controller.
+ * @description: 包含：创建订单、查询订单列表、查询单个订单、取消订单
  */
 @RestController
 @RequestMapping("/buyer/order")
@@ -32,9 +31,11 @@ import java.util.Map;
 public class BuyerOrderController {
     
     private final OrderService orderService;
+    private final BuyerService buyerService;
     
-    public BuyerOrderController(OrderService orderService) {
+    public BuyerOrderController(OrderService orderService, BuyerService buyerService) {
         this.orderService = orderService;
+        this.buyerService = buyerService;
     }
     
     // 创建订单
@@ -55,49 +56,32 @@ public class BuyerOrderController {
         OrderDTO createResult = orderService.create(orderDTO);
         Map<String, String> map = new HashMap<>();
         map.put("orderId", createResult.getOrderId());
-        return ResultVOUtil.success(map);
+        return new ResultVOUtil<Map<String, String>>().success(map);
     }
     
-    // 订单列表
+    // 查询订单列表
     @GetMapping("/list")
-    public ResultVO<List<OrderDTO>> list(@RequestParam("openid") String openid,
-                                         @RequestParam(value = "page", defaultValue = "0") Integer page,
-                                         @RequestParam(value = "size", defaultValue = "10") Integer size) {
-        if (StringUtils.isEmpty(openid)) {
-            log.error("【查询订单列表】openid为空");
-            throw new OrderException(ResultEnum.PARAM_ERROR);
-        }
-    
-        PageRequest request = new PageRequest(page, size);
-        Page<OrderDTO> orderDTOPage = orderService.findOrderList(openid, request);
-    
-        return ResultVOUtil.success(orderDTOPage.getContent());
+    public ResultVO<List<OrderDTO>> list(
+            @RequestParam("openid") String openid,
+            @RequestParam(value = "page", defaultValue = "0") Integer page,
+            @RequestParam(value = "size", defaultValue = "10") Integer size) throws Exception {
+        List<OrderDTO> orderDTOList = buyerService.findOrderList(openid, page, size).getContent();
+        return new ResultVOUtil<List<OrderDTO>>().success(orderDTOList);
     }
     
-    // 订单详情
+    // 根据orderId查询订单(OrderDTO)
     @GetMapping("/detail")
-    public ResultVO<OrderDTO> detail(@RequestParam("orderId") String orderId) throws Exception {
-        if (StringUtils.isEmpty(orderId)) {
-            log.error("【查询订单详情】 orderId为空");
-            throw new OrderException(ResultEnum.PARAM_ERROR);
-        }
-    
-        OrderDTO orderDTO = orderService.findByOrderId(orderId);
-        return ResultVOUtil.success(orderDTO);
+    public ResultVO<OrderDTO> detail(@RequestParam("openid") String openid,
+                                     @RequestParam("orderId") String orderId) throws Exception {
+        OrderDTO orderDTO = buyerService.findOrderOne(openid, orderId);
+        return new ResultVOUtil<OrderDTO>().success(orderDTO);
     }
     
-    // 取消订单
+    // 根据orderId取消订单
     @PostMapping("/cancel")
-    public ResultVO<OrderDTO> cancel(@RequestParam("orderId") String orderId) throws Exception {
-        if (StringUtils.isEmpty(orderId)) {
-            log.error("【查询订单详情】 orderId为空");
-            throw new OrderException(ResultEnum.PARAM_ERROR);
-        }
-    
-        OrderDTO orderDTO = orderService.findByOrderId(orderId);
-        orderService.cancel(orderDTO);
-        orderDTO = orderService.findByOrderId(orderId);
-        return ResultVOUtil.success();
+    public ResultVO<OrderDTO> cancel(@RequestParam("openid") String openid,
+                                     @RequestParam("orderId") String orderId) throws Exception {
+        buyerService.cancelOrder(openid, orderId);
+        return new ResultVOUtil<OrderDTO>().success(null);
     }
-    
 }

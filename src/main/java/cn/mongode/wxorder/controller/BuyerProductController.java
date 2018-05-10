@@ -73,6 +73,6 @@ public class BuyerProductController {
             productVOList.add(productVO);
         }
         
-        return ResultVOUtil.success(productVOList);
+        return new ResultVOUtil<List<ProductVO>>().success(productVOList);
     }
 }

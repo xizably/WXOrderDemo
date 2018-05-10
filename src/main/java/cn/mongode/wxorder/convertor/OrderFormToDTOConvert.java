@@ -13,9 +13,10 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 
 /**
+ * OrderForm转换为OrderDTO的转换器
  * @author: Mongo
  * @date: 2018/5/8
- * @description: 数据转换 - OrderForm 转为 OrderDTOConvert.
+ * @description: OrderForm -> OrderDTO.
  */
 @Slf4j
 public class OrderFormToDTOConvert {
@@ -40,5 +41,4 @@ public class OrderFormToDTOConvert {
         orderDTO.setOrderDetailList(orderDetailList);
         return orderDTO;
     }
-    
 }

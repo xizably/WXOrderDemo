@@ -6,10 +6,10 @@ import lombok.Data;
 import java.util.List;
 
 /**
- * 商品（包含类目）
+ * 商品VO(ViewObject-表现层对象)
  * @author: Mongo
  * @date: 2018/4/28
- * @description:
+ * @description: 包含：商品类目名称、商品类目类型、ProductInfoVO(商品信息VO)列表
  */
 @Data
 public class ProductVO {

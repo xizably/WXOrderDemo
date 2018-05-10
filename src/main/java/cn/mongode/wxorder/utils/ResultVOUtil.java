@@ -3,22 +3,19 @@ package cn.mongode.wxorder.utils;
 import cn.mongode.wxorder.VO.ResultVO;
 
 /**
+ * http请求返回的最外层对象工具
  * @author: Mongo
  * @date: 2018/5/2
- * @description:
+ * @description: 包含结果：成功、失败
  */
 public class ResultVOUtil<T> {
     
-    public static ResultVO success(Object object) {
-        ResultVO resultVO = new ResultVO();
+    public ResultVO<T> success(T t) {
+        ResultVO<T> resultVO = new ResultVO<>();
         resultVO.setCode(0);
         resultVO.setMsg("成功!");
-        resultVO.setData(object);
+        resultVO.setData(t);
         return resultVO;
-    }
-    
-    public static ResultVO success() {
-        return success(null);
     }
     
     public static ResultVO error(Integer code, String msg) {

@@ -2,6 +2,9 @@ package cn.mongode.wxorder.enums;
 
 import lombok.Getter;
 
+/**
+ * 结果错误类型的枚举
+ */
 @Getter
 public enum ResultEnum {
     PARAM_ERROR(1, "参数不正确"),
@@ -14,6 +17,7 @@ public enum ResultEnum {
     ORDER_DETAIL_EMPTY(16, "订单商品详情为空"),
     ORDER_PAY_STATUS_ERROR(16, "订单商品详情为空"),
     CART_EMPTY(18, "购物车为空"),
+    ORDER_OWNER_ERROR(19, "此订单不属于当前用户"),
     ;
     
     private Integer code;

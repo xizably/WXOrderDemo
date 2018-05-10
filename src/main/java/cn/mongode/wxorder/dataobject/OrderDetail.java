@@ -1,5 +1,7 @@
 package cn.mongode.wxorder.dataobject;
 
+import cn.mongode.wxorder.utils.serializer.Date2LongSerializer;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import lombok.Data;
 
 import javax.persistence.Entity;
@@ -8,9 +10,10 @@ import java.math.BigDecimal;
 import java.util.Date;
 
 /**
+ * 订单详情DAO:data access object(数据访问对象)
  * @author: Mongo
  * @date: 2018/5/2
- * @description:
+ * @description: 包含商品信息，关联订单主体
  */
 @Entity
 @Data
@@ -37,10 +40,12 @@ public class OrderDetail {
     /* 商品小图. */
     private String productIcon;
     
-    /* 创建时间. */
+    /* 创建时间.查询时序列化为Long */
+    @JsonSerialize(using = Date2LongSerializer.class)
     private Date createTime;
     
-    /* 更新时间. */
+    /* 更新时间.查询时序列化为Long */
+    @JsonSerialize(using = Date2LongSerializer.class)
     private Date updateTime;
     
     public OrderDetail() {

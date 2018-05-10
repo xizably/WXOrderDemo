@@ -6,7 +6,7 @@ import lombok.Data;
  * 购物车
  * @author: Mongo
  * @date: 2018/5/2
- * @description:
+ * @description: 购物车DTO - Data Transfer Object（数据传输对象）
  */
 @Data
 public class CartDTO {

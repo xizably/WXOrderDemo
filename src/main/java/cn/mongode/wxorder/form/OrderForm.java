@@ -5,9 +5,11 @@ import lombok.Data;
 import javax.validation.constraints.NotEmpty;
 
 /**
+ * 订单的表单
  * @author: Mongo
  * @date: 2018/5/8
- * @description:
+ * @description: 包含：买家信息、购物车 - 非空类属性添加了非空注解@NotEmpty,
+ *               判定时在类名前使用@Valid进行验证, 如@Valid OrderForm orderForm
  */
 @Data
 public class OrderForm {
